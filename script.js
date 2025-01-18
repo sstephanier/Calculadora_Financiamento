@@ -1,123 +1,113 @@
-document.getElementById("financingForm").addEventListener("submit", function (event) {
-    event.preventDefault(); // Previne o recarregamento da página
+document.getElementById("formularioFinanciamento").addEventListener("submit", function (evento) {
+    evento.preventDefault(); // Previne o recarregamento da página
 
-    // Captura os valores do formulário
-    const propertyValue = document.getElementById("propertyValue").value;
-    const downPayment = document.getElementById("downPayment").value;
-    const system = document.getElementById("system").value;
-    const installments = document.getElementById("installments").value;
-    const rate = document.getElementById("rate").value;
+    const valorImovel = document.getElementById("valorImovel").value;
+    const valorEntrada = document.getElementById("valorEntrada").value;
+    const sistema = document.getElementById("sistema").value;
+    const parcelas = document.getElementById("parcelas").value;
+    const taxa = document.getElementById("taxa").value;
 
-    // Validação para campos vazios
-    if (!propertyValue || !downPayment || !system || !installments || !rate) {
+    if (!valorImovel || !valorEntrada || !sistema || !parcelas || !taxa) {
         alert("Por favor, preencha todos os campos antes de prosseguir.");
         return;
     }
 
-    // Conversão dos valores para o tipo adequado
-    const propertyValueFloat = parseFloat(propertyValue);
-    const downPaymentFloat = parseFloat(downPayment);
-    const installmentsInt = parseInt(installments);
-    const rateFloat = parseFloat(rate) / 100;
+    const valorImovelFloat = parseFloat(valorImovel);
+    const valorEntradaFloat = parseFloat(valorEntrada);
+    const parcelasInt = parseInt(parcelas);
+    const taxaFloat = parseFloat(taxa) / 100;
 
-    // Valida os dados do formulário
     if (
-        propertyValueFloat <= 0 ||
-        downPaymentFloat < 0 ||
-        downPaymentFloat >= propertyValueFloat ||
-        installmentsInt <= 0 ||
-        rateFloat <= 0
+        valorImovelFloat <= 0 ||
+        valorEntradaFloat < 0 ||
+        valorEntradaFloat >= valorImovelFloat ||
+        parcelasInt <= 0 ||
+        taxaFloat <= 0
     ) {
         alert("Por favor, insira valores válidos.");
         return;
     }
 
-    const loanAmount = propertyValueFloat - downPaymentFloat; // Valor financiado
-    let result = [];
+    const valorFinanciado = valorImovelFloat - valorEntradaFloat;
+    let resultado = [];
 
-    // Calcula o financiamento com base no sistema escolhido
-    if (system === "SAC") {
-        result = calculateSAC(loanAmount, installmentsInt, rateFloat);
-    } else if (system === "Price") {
-        result = calculatePrice(loanAmount, installmentsInt, rateFloat);
-    } else if (system === "SAM") {
-        result = calculateSAM(loanAmount, installmentsInt, rateFloat);
+    if (sistema === "SAC") {
+        resultado = calcularSAC(valorFinanciado, parcelasInt, taxaFloat);
+    } else if (sistema === "Price") {
+        resultado = calcularPrice(valorFinanciado, parcelasInt, taxaFloat);
+    } else if (sistema === "SAM") {
+        resultado = calcularSAM(valorFinanciado, parcelasInt, taxaFloat);
     } else {
         alert("Selecione um sistema de financiamento válido.");
         return;
     }
 
-    // Salva os resultados no localStorage
-    localStorage.setItem("financingResult", JSON.stringify(result));
+    localStorage.setItem("resultadoFinanciamento", JSON.stringify(resultado));
 
-    // Redireciona para a página de resultado
     window.location.href = "result.html";
 });
 
-// Cálculo do sistema SAC
-function calculateSAC(loanAmount, installments, rate) {
-    const amortization = loanAmount / installments;
-    let balance = loanAmount;
-    let result = [];
+function calcularSAC(valorFinanciado, parcelas, taxa) {
+    const amortizacao = valorFinanciado / parcelas;
+    let saldo = valorFinanciado;
+    let resultado = [];
 
-    for (let i = 1; i <= installments; i++) {
-        const interest = balance * rate;
-        const installment = amortization + interest;
-        result.push({
-            installmentNumber: i,
-            amortization: amortization.toFixed(2),
-            interest: interest.toFixed(2),
-            installment: installment.toFixed(2),
-            balance: (balance - amortization).toFixed(2)
+    for (let i = 1; i <= parcelas; i++) {
+        const juros = saldo * taxa;
+        const parcela = amortizacao + juros;
+        resultado.push({
+            numeroParcela: i,
+            amortizacao: amortizacao.toFixed(2),
+            juros: juros.toFixed(2),
+            parcela: parcela.toFixed(2),
+            saldo: (saldo - amortizacao).toFixed(2)
         });
-        balance -= amortization;
+        saldo -= amortizacao;
     }
 
-    return result;
+    return resultado;
 }
 
-// Cálculo do sistema Price
-function calculatePrice(loanAmount, installments, rate) {
-    const factor = (rate * Math.pow(1 + rate, installments)) / (Math.pow(1 + rate, installments) - 1);
-    const installment = loanAmount * factor;
-    let balance = loanAmount;
-    let result = [];
+function calcularPrice(valorFinanciado, parcelas, taxa) {
+    const fator = (taxa * Math.pow(1 + taxa, parcelas)) / (Math.pow(1 + taxa, parcelas) - 1);
+    const parcela = valorFinanciado * fator;
+    let saldo = valorFinanciado;
+    let resultado = [];
 
-    for (let i = 1; i <= installments; i++) {
-        const interest = balance * rate;
-        const amortization = installment - interest;
-        result.push({
-            installmentNumber: i,
-            amortization: amortization.toFixed(2),
-            interest: interest.toFixed(2),
-            installment: installment.toFixed(2),
-            balance: (balance - amortization).toFixed(2)
+    for (let i = 1; i <= parcelas; i++) {
+        const juros = saldo * taxa;
+        const amortizacao = parcela - juros;
+        resultado.push({
+            numeroParcela: i,
+            amortizacao: amortizacao.toFixed(2),
+            juros: juros.toFixed(2),
+            parcela: parcela.toFixed(2),
+            saldo: (saldo - amortizacao).toFixed(2)
         });
-        balance -= amortization;
+        saldo -= amortizacao;
     }
 
-    return result;
+    return resultado;
 }
 
-// Cálculo do sistema SAM (misto)
-function calculateSAM(loanAmount, installments, rate) {
-    const midPoint = Math.floor(installments / 2);
-    const amortization = loanAmount / installments;
-    let balance = loanAmount;
-    let result = [];
+function calcularSAM(valorFinanciado, parcelas, taxa) {
+    const meioPonto = Math.floor(parcelas / 2);
+    const amortizacao = valorFinanciado / parcelas;
+    let saldo = valorFinanciado;
+    let resultado = [];
 
-    for (let i = 1; i <= installments; i++) {
-        const interest = balance * rate;
-        const installment = i <= midPoint ? amortization + interest : (amortization + interest) * 0.8;
-        result.push({
-            installmentNumber: i,
-            amortization: amortization.toFixed(2),
-            interest: interest.toFixed(2),
-            installment: installment.toFixed(2),
-            balance: (balance - amortization).toFixed(2)
+    for (let i = 1; i <= parcelas; i++) {
+        const juros = saldo * taxa;
+        const parcela = i <= meioPonto ? amortizacao + juros : (amortizacao + juros) * 0.8;
+        resultado.push({
+            numeroParcela: i,
+            amortizacao: amortizacao.toFixed(2),
+            juros: juros.toFixed(2),
+            parcela: parcela.toFixed(2),
+            saldo: (saldo - amortizacao).toFixed(2)
         });
-        balance -= amortization;
+        saldo -= amortizacao;
     }
 
-    return result;
+    return resultado;
 }

@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="pt-br">
 
 <head>
     <meta charset="UTF-8">
@@ -12,18 +12,18 @@
 <body>
     <div class="container mt-5">
         <h1 class="text-center">Simulador de Financiamento</h1>
-        <form id="financingForm">
+        <form id="formularioFinanciamento">
             <div class="mb-3">
-                <label for="propertyValue" class="form-label">Valor do Imóvel (R$)</label>
-                <input type="number" id="propertyValue" class="form-control" required>
+                <label for="valorImovel" class="form-label">Valor do Imóvel (R$)</label>
+                <input type="number" id="valorImovel" class="form-control" required>
             </div>
             <div class="mb-3">
-                <label for="downPayment" class="form-label">Valor de Entrada (R$)</label>
-                <input type="number" id="downPayment" class="form-control" required>
+                <label for="valorEntrada" class="form-label">Valor de Entrada (R$)</label>
+                <input type="number" id="valorEntrada" class="form-control" required>
             </div>
             <div class="mb-3">
-                <label for="system" class="form-label">Sistema de Financiamento</label>
-                <select id="system" class="form-select" required>
+                <label for="sistema" class="form-label">Sistema de Financiamento</label>
+                <select id="sistema" class="form-select" required>
                     <option value="" disabled selected>Escolha uma opção</option>
                     <option value="SAC">SAC</option>
                     <option value="Price">Price</option>
@@ -31,12 +31,12 @@
                 </select>
             </div>
             <div class="mb-3">
-                <label for="installments" class="form-label">Número de Parcelas</label>
-                <input type="number" id="installments" class="form-control" required>
+                <label for="parcelas" class="form-label">Número de Parcelas</label>
+                <input type="number" id="parcelas" class="form-control" required>
             </div>
             <div class="mb-3">
-                <label for="rate" class="form-label">Taxa de Juros Mensal (%)</label>
-                <input type="number" id="rate" class="form-control" step="0.01" required>
+                <label for="taxa" class="form-label">Taxa de Juros Mensal (%)</label>
+                <input type="number" id="taxa" class="form-control" step="0.01" required>
             </div>
             <button type="submit" class="btn btn-primary">Calcular Financiamento</button>
         </form>
