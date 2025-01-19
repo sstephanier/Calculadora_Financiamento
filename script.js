@@ -42,8 +42,13 @@ document.getElementById("formularioFinanciamento").addEventListener("submit", fu
         return;
     }
 
+    // Salvar o valor financiado no localStorage
+    localStorage.setItem("valorFinanciado", valorFinanciado.toFixed(2));
+
+    // Salvar o resultado do financiamento no localStorage
     localStorage.setItem("resultadoFinanciamento", JSON.stringify(resultado));
 
+    // Redirecionar para a página de resultados
     window.location.href = "result.html";
 });
 
@@ -91,23 +96,32 @@ function calcularPrice(valorFinanciado, parcelas, taxa) {
 }
 
 function calcularSAM(valorFinanciado, parcelas, taxa) {
-    const meioPonto = Math.floor(parcelas / 2);
-    const amortizacao = valorFinanciado / parcelas;
-    let saldo = valorFinanciado;
-    let resultado = [];
+    // Calcula os valores usando os sistemas SAC e Price
+    const resultadoSAC = calcularSAC(valorFinanciado, parcelas, taxa);
+    const resultadoPrice = calcularPrice(valorFinanciado, parcelas, taxa);
 
-    for (let i = 1; i <= parcelas; i++) {
-        const juros = saldo * taxa;
-        const parcela = i <= meioPonto ? amortizacao + juros : (amortizacao + juros) * 0.8;
-        resultado.push({
-            numeroParcela: i,
-            amortizacao: amortizacao.toFixed(2),
-            juros: juros.toFixed(2),
-            parcela: parcela.toFixed(2),
-            saldo: (saldo - amortizacao).toFixed(2)
+    let resultadoSAM = [];
+
+    for (let i = 0; i < parcelas; i++) {
+        const amortizacaoMedia =
+            (parseFloat(resultadoSAC[i].amortizacao) + parseFloat(resultadoPrice[i].amortizacao)) / 2;
+        const jurosMedia =
+            (parseFloat(resultadoSAC[i].juros) + parseFloat(resultadoPrice[i].juros)) / 2;
+        const parcelaMedia =
+            (parseFloat(resultadoSAC[i].parcela) + parseFloat(resultadoPrice[i].parcela)) / 2;
+
+        const saldo = i === 0
+            ? valorFinanciado - amortizacaoMedia
+            : resultadoSAM[i - 1].saldo - amortizacaoMedia;
+
+        resultadoSAM.push({
+            numeroParcela: i + 1,
+            amortizacao: amortizacaoMedia.toFixed(2),
+            juros: jurosMedia.toFixed(2),
+            parcela: parcelaMedia.toFixed(2),
+            saldo: saldo.toFixed(2)
         });
-        saldo -= amortizacao;
     }
 
-    return resultado;
+    return resultadoSAM;
 }

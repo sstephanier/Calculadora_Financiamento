@@ -21,8 +21,9 @@
 
     <script>
         const resultadoFinanciamento = JSON.parse(localStorage.getItem("resultadoFinanciamento"));
+        const valorFinanciado = parseFloat(localStorage.getItem("valorFinanciado"));
 
-        if (!resultadoFinanciamento) {
+        if (!resultadoFinanciamento || !valorFinanciado) {
             document.getElementById("tabelaResultado").innerHTML = "<p>Erro: Nenhum dado de financiamento encontrado.</p>";
         } else {
             let tabela = `
@@ -40,6 +41,9 @@
             `;
 
             let valoresParcelas = [];
+            let totalJuros = 0;
+            let totalFinanciamento = 0;
+
             resultadoFinanciamento.forEach(linha => {
                 tabela += `
                     <tr>
@@ -51,6 +55,8 @@
                     </tr>
                 `;
                 valoresParcelas.push(parseFloat(linha.parcela));
+                totalJuros += parseFloat(linha.juros);
+                totalFinanciamento += parseFloat(linha.parcela);
             });
 
             tabela += "</tbody></table>";
@@ -87,9 +93,15 @@
             // Sugestão com base no parcelamento
             const maxParcela = Math.max(...valoresParcelas);
             const minParcela = Math.min(...valoresParcelas);
+
             document.getElementById("textoSugestao").innerHTML = `
                 <strong>Análise:</strong> O maior valor de parcela é de R$ ${maxParcela.toFixed(2)}, 
                 enquanto o menor é de R$ ${minParcela.toFixed(2)}. 
+                <br>
+                <strong>Valor total financiado com juros:</strong> R$ ${totalFinanciamento.toFixed(2)}.
+                <br>
+                <strong>Valor total dos juros:</strong> R$ ${totalJuros.toFixed(2)} (${((totalJuros / valorFinanciado) * 100).toFixed(2)}% do valor inicial).
+                <br>
                 Para minimizar o impacto financeiro, avalie a possibilidade de antecipar parcelas ou escolher um sistema 
                 com menor variação de valores.
             `;
