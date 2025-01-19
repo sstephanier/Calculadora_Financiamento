@@ -24,7 +24,7 @@ Este projeto é uma aplicação web que permite aos usuários calcular financiam
    git clone https://github.com/sstephanier/Calculadora_Financiamento.git
 
 2. Link do deploy:
-    https://sstephanier.github.io/Calculadora_Financiamento/ 
+    https://calculadorafinanciamento.netlify.app/
 
 ## Integrantes
 
