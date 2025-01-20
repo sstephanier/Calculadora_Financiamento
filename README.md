@@ -15,7 +15,6 @@ Este projeto é uma aplicação web que permite aos usuários calcular financiam
 
 - **Backend**: JavaScript JS
 - **Frontend**: HTML, CSS, Bootstrap
-- **Gráficos**: 
 
 ## Como Executar o Projeto Localmente
 
